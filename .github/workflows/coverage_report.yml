@@ -1,0 +1,18 @@
+name: Scraper Report Coverage
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  report_coverage:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Generate Coverage
+        run: echo 'generate coverage'
+
+      - name: Report coverage
+        run: echo 'report coverage'
