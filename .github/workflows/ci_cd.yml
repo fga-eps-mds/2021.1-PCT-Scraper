@@ -23,6 +23,13 @@ jobs:
       - name: Build image
         run: docker-compose up
 
+  sonarAnalysis:
+    - name: SonarCloud Analysis
+      uses: sonarsource/sonarcloud-github-action@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
   deploy:
     if: github.ref == 'refs/heads/main'
     needs: integration
