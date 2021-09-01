@@ -21,7 +21,7 @@ jobs:
         run: echo 'stylesheet check'
 
       - name: Build image
-        run: docker-compose up
+        run: docker build -t pcts-documents .
 
   sonarAnalysis:
     needs: build
