@@ -1,4 +1,4 @@
-name: Scraper Report Coverage
+name: Report Coverage
 
 on:
   push:

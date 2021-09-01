@@ -1,10 +1,10 @@
 version: "3.5"
 services:
-  pcts-scraper:
-    container_name: pcts-scraper
+  pcts-documents:
+    container_name: pcts-documents
     # restart: unless-stopped
     build: .
-    image: pcts-scraper
+    image: pcts-documents
     env_file: dev-env
     command: "echo 'hello world!'"
     ports:
@@ -17,7 +17,7 @@ services:
 
 volumes:
   pip-cache:
-    name: pcts-scraper-pip-cache
+    name: pcts-documents-pip-cache
 
 networks:
   pcts-network:

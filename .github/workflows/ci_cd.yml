@@ -1,4 +1,4 @@
-name: Scraper CI/CD
+name: CI/CD
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
       - "*"
 
 jobs:
-  integration:
+  build:
     runs-on: ubuntu-latest
     env:
       GIT_SHA: ${{ github.sha }}
@@ -24,15 +24,20 @@ jobs:
         run: docker-compose up
 
   sonarAnalysis:
-    - name: SonarCloud Analysis
-      uses: sonarsource/sonarcloud-github-action@master
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    needs: build
+    name: SonarCloud Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Analyze with SonarCloud
+        uses: sonarsource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   deploy:
     if: github.ref == 'refs/heads/main'
-    needs: integration
+    needs: build
     runs-on: ubuntu-latest
 
     steps:
