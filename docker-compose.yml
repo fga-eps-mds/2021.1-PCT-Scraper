@@ -1,10 +1,10 @@
 version: "3.5"
 services:
-  pcts_documents:
-    container_name: pcts_documents
+  pcts-documents:
+    container_name: pcts-documents
     # restart: unless-stopped
     build: .
-    image: pcts_documents
+    image: pcts-documents
     env_file: dev-env
     command: ["sh", "scripts/start_dev.sh"]
     ports:
@@ -17,7 +17,7 @@ services:
 
 volumes:
   pip-cache:
-    name: pcts_documents-pip-cache
+    name: pcts-documents-pip-cache
 
 networks:
   pcts-network:

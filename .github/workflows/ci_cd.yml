@@ -25,10 +25,7 @@ jobs:
 
       - name: Run tests
         run: |
-          docker run \
-            --env ENVIRONMENT=development \
-            --env ALLOWED_HOSTS=* \
-            --network ${{ job.container.network }} \
+          docker run --env ENVIRONMENT=development --env ALLOWED_HOSTS=* \
             --volume ${PWD}/:/app \
             pcts-documents bash -c \
             "python manage.py makemigrations && \
