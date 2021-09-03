@@ -25,24 +25,12 @@ jobs:
 
       - name: Run tests
         run: |
-          docker run --env ENVIRONMENT=development --env ALLOWED_HOSTS=* \
-            --volume ${PWD}/:/app \
-            pcts-documents bash -c \
-            "python manage.py makemigrations && \
-              python manage.py migrate && coverage run --source='.' \
+          docker run --env ENVIRONMENT=development --env ALLOWED_HOSTS=*\
+            --volume ${PWD}/:/app\
+            pcts-documents bash -c\
+            "python manage.py makemigrations &&\
+              python manage.py migrate && coverage run --source='.'\
               manage.py test && coverage xml"
-
-  sonarAnalysis:
-    needs: integration
-    name: SonarCloud Analysis
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Analyze with SonarCloud
-        uses: sonarsource/sonarcloud-github-action@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   deploy_dev:
     if: github.ref == 'refs/heads/dev'
