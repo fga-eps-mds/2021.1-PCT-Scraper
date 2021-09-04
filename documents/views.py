@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import viewsets
 from rest_framework import permissions
-from pcts_documents.documents.serializers import DocumentSerializer
+from documents.serializers import DocumentSerializer
 
 
 class DocumentViewSet(viewsets.ModelViewSet):

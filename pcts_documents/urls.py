@@ -18,7 +18,7 @@ from django.urls import path
 
 from django.urls import include, path
 from rest_framework import routers
-from pcts_documents.documents import views
+from documents import views
 
 router = routers.DefaultRouter()
 router.register(r'documents', views.DocumentViewSet)
