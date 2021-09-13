@@ -30,6 +30,12 @@ jobs:
               python manage.py migrate && coverage run --source='.'\
               manage.py test && coverage xml"
 
+      - name: SonarCloud Report coverage
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
   deploy_dev:
     if: github.ref == 'refs/heads/dev'
     needs: integration
