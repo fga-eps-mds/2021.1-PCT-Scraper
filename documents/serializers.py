@@ -1,8 +1,12 @@
 from rest_framework import serializers
-from documents.models import Document
+from documents.models import Informacao, Glossario
 
 
-class DocumentSerializer(serializers.HyperlinkedModelSerializer):
+class InformacaoSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Document
-        fields = ['title', 'url', 'description', 'created_at']
+        model = Informacao
+        fields = '__all__'
+class GlossarioSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Glossario
+        fields = '__all__'
