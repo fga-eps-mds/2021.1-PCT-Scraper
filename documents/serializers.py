@@ -1,12 +1,12 @@
 from rest_framework import serializers
-from documents.models import Informacao, Glossario
+from documents.models import Document, Glossary
 
 
-class InformacaoSerializer(serializers.ModelSerializer):
+class DocumentSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Informacao
+        model = Document
         fields = '__all__'
-class GlossarioSerializer(serializers.ModelSerializer):
+class GlossarySerializer(serializers.ModelSerializer):
     class Meta:
-        model = Glossario
+        model = Glossary
         fields = '__all__'
