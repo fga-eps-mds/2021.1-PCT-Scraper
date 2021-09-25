@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -86,11 +87,11 @@ DATABASES = {
         'NAME': 'pcts-documents-mongodb',
         'ENFORCE_SCHEMA': False,
         'CLIENT': {
-                'host': 'pcts-documents-mongodb',
-                'port': 27017,
-                'username': 'root',
-                'password': 'pctsdocuments',
-                'authMechanism': 'SCRAM-SHA-1'
+            'host': os.environ.get('PCTS_DOCUMENTS_DB_HOST'),
+            'port': int(os.environ.get('PCTS_DOCUMENTS_DB_PORT')),
+            'username': os.environ.get('PCTS_DOCUMENTS_DB_USER'),
+            'password': os.environ.get('PCTS_DOCUMENTS_DB_PASS'),
+            'authMechanism': 'SCRAM-SHA-1'
         }
     }
 }

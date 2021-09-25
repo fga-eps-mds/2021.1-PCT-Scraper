@@ -51,7 +51,12 @@ services:
     hostname: pcts-documents
     build: .
     image: pcts-documents
-    env_file: dev-env
+    environment:
+      PCTS_DOCUMENTS_DB_HOST: pcts-documents-mongodb
+      PCTS_DOCUMENTS_DB_PORT: 27017
+      PCTS_DOCUMENTS_DB_USER: root
+      PCTS_DOCUMENTS_DB_PASS: pctsdocuments
+    # env_file: dev-env
     command: ["sh", "scripts/start_dev.sh"]
     ports:
       - 8000:8000
