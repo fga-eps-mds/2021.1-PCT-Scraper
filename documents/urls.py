@@ -5,7 +5,7 @@ from documents import views
 
 
 router = routers.DefaultRouter()
-router.register(r'document', views.DocumentViewSet)
+router.register(r'documents', views.DocumentViewSet)
 router.register(r'glossary', views.GlossaryViewSet)
 
 urlpatterns = [
