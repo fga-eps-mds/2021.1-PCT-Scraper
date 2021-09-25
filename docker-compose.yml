@@ -47,7 +47,8 @@ services:
 
   pcts-documents:
     container_name: pcts-documents
-    # restart: unless-stopped
+    restart: unless-stopped
+    hostname: pcts-documents
     build: .
     image: pcts-documents
     env_file: dev-env
