@@ -12,6 +12,17 @@ jobs:
     env:
       GIT_SHA: ${{ github.sha }}
 
+    services:
+      pcts-documents-mongodb:
+        image: mongo
+        env:
+          MONGO_INITDB_ROOT_USERNAME: root
+          MONGO_INITDB_ROOT_PASSWORD: pctsdocuments
+        options: >-
+          --name pcts-documents-mongodb
+        ports:
+          - 27017:27017
+
     steps:
       - uses: actions/checkout@v2
 
@@ -24,7 +35,12 @@ jobs:
       - name: Run tests
         run: |
           docker run --env ENVIRONMENT=development --env ALLOWED_HOSTS=*\
+            --env PCTS_DOCUMENTS_DB_HOST=pcts-documents-mongodb\
+            --env PCTS_DOCUMENTS_DB_PORT=27017\
+            --env PCTS_DOCUMENTS_DB_USER=root\
+            --env PCTS_DOCUMENTS_DB_PASS=pctsdocuments\
             --volume ${PWD}/:/app\
+            --network ${{ job.container.network }}\
             pcts-documents bash -c\
             "python manage.py makemigrations &&\
               python manage.py migrate && coverage run --source='.'\

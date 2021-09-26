@@ -1,13 +1,21 @@
-from django.contrib.auth.models import User, Group
 from rest_framework import viewsets
-from rest_framework import permissions
 from documents.serializers import DocumentSerializer
+from documents.serializers import GlossarySerializer
+
+from documents.models import Document
+from documents.models import Glossary
 
 
 class DocumentViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows documents to be viewed or edited.
+    API endpoint that allows Documents to be viewed or edited.
     """
-    queryset = User.objects.all().order_by('-date_joined')
+    queryset = Document.objects.all()
     serializer_class = DocumentSerializer
-    # permission_classes = [permissions.IsAuthenticated]
+
+class GlossaryViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows Glossary to be viewed or edited.
+    """
+    queryset = Glossary.objects.all()
+    serializer_class = GlossarySerializer

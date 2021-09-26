@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -82,8 +83,16 @@ WSGI_APPLICATION = 'pcts_documents.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'djongo',
+        'NAME': 'pcts-documents-mongodb',
+        'ENFORCE_SCHEMA': False,
+        'CLIENT': {
+            'host': os.environ.get('PCTS_DOCUMENTS_DB_HOST'),
+            'port': int(os.environ.get('PCTS_DOCUMENTS_DB_PORT')),
+            'username': os.environ.get('PCTS_DOCUMENTS_DB_USER'),
+            'password': os.environ.get('PCTS_DOCUMENTS_DB_PASS'),
+            'authMechanism': 'SCRAM-SHA-1'
+        }
     }
 }
 
@@ -112,13 +121,15 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Sao_Paulo'
 
 USE_I18N = True
 
 USE_L10N = True
 
 USE_TZ = True
+
+DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 
 
 # Static files (CSS, JavaScript, Images)
