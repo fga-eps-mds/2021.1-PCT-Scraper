@@ -30,7 +30,7 @@ jobs:
         run: echo 'stylesheet check'
 
       - name: Build image
-        run: docker build -t pcts-documents .
+        run: docker-compose build --build-arg PORT=27017 -t pcts-documents .
 
       - name: Run tests
         run: |
