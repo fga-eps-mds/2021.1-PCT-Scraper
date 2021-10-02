@@ -35,10 +35,12 @@ jobs:
       - name: Run tests
         run: |
           docker run --env ENVIRONMENT=development --env ALLOWED_HOSTS=*\
+            --env ALLOWED_HOSTS=*\
             --env PCTS_DOCUMENTS_DB_HOST=pcts-documents-mongodb\
             --env PCTS_DOCUMENTS_DB_PORT=27017\
             --env PCTS_DOCUMENTS_DB_USER=root\
             --env PCTS_DOCUMENTS_DB_PASS=pctsdocuments\
+            --env PCTS_DOCUMENTS_DB_NAME=pcts-documents-mongodb\
             --volume ${PWD}/:/app\
             --network ${{ job.container.network }}\
             pcts-documents bash -c\

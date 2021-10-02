@@ -52,7 +52,7 @@ services:
     build: .
     image: pcts-documents
     environment:
-      ALLOWED_HOSTS: *
+      ALLOWED_HOSTS: '*'
       PCTS_DOCUMENTS_DB_HOST: pcts-documents-mongodb
       PCTS_DOCUMENTS_DB_PORT: 27017
       PCTS_DOCUMENTS_DB_USER: root
