@@ -7,3 +7,5 @@ WORKDIR /app
 RUN apt-get update &&\
     apt-get install -y python3-pip &&\
     pip install -r requirements.txt
+
+RUN python manage.py runserver 0.0.0.0:$PORT
