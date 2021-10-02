@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-csjnfz&f1o=0h%9)sb%4gxh!dx0hxb3eh*qjz&94@d@46423^l
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [os.environ.get('ALLOWED_HOSTS')]
 
 
 # Application definition
@@ -84,7 +84,7 @@ WSGI_APPLICATION = 'pcts_documents.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'djongo',
-        'NAME': 'pcts-documents-mongodb',
+        'NAME': os.environ.get('PCTS_DOCUMENTS_DB_NAME'),
         'ENFORCE_SCHEMA': False,
         'CLIENT': {
             'host': os.environ.get('PCTS_DOCUMENTS_DB_HOST'),
@@ -93,7 +93,12 @@ DATABASES = {
             'password': os.environ.get('PCTS_DOCUMENTS_DB_PASS'),
             'authMechanism': 'SCRAM-SHA-1'
         }
-    }
+    },
+
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': 'sqlite3.db',
+    # }
 }
 
 
