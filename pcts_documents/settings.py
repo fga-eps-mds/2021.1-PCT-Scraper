@@ -102,7 +102,7 @@ if ENVIRONMENT_TYPE == 'development':
             'authMechanism': 'SCRAM-SHA-1'
         }
     }
-elif ENVIRONMENT_TYPE == 'homologation':
+elif ENVIRONMENT_TYPE == 'homologation' or ENVIRONMENT_TYPE == 'production':
     DATABASES['default'] = {
         'ENGINE': 'djongo',
         'NAME': os.environ.get('PCTS_DOCUMENTS_DB_NAME'),
