@@ -27,6 +27,7 @@ SECRET_KEY = 'django-insecure-csjnfz&f1o=0h%9)sb%4gxh!dx0hxb3eh*qjz&94@d@46423^l
 DEBUG = True
 
 ALLOWED_HOSTS = [os.environ.get('ALLOWED_HOSTS')]
+ENVIRONMENT_TYPE = os.environ.get('ENVIRONMENT', default='development')
 
 
 # Application definition
@@ -82,7 +83,14 @@ WSGI_APPLICATION = 'pcts_documents.wsgi.application'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': 'sqlite3.db',
+    # }
+}
+
+if ENVIRONMENT_TYPE == 'development':
+    DATABASES['default'] = {
         'ENGINE': 'djongo',
         'NAME': os.environ.get('PCTS_DOCUMENTS_DB_NAME'),
         'ENFORCE_SCHEMA': False,
@@ -93,13 +101,16 @@ DATABASES = {
             'password': os.environ.get('PCTS_DOCUMENTS_DB_PASS'),
             'authMechanism': 'SCRAM-SHA-1'
         }
-    },
-
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.sqlite3',
-    #     'NAME': 'sqlite3.db',
-    # }
-}
+    }
+elif ENVIRONMENT_TYPE == 'homologation':
+    DATABASES['default'] = {
+        'ENGINE': 'djongo',
+        'NAME': os.environ.get('PCTS_DOCUMENTS_DB_NAME'),
+        'ENFORCE_SCHEMA': False,
+        'CLIENT': {
+            'host': os.environ.get('PCTS_DOCUMENTS_MONGODB_URL')
+        }
+    }
 
 
 # Password validation
