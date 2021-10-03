@@ -59,3 +59,9 @@ Para carregar um dump da base de um arquivo para a base de dados de documentos, 
 ```shell
 docker exec -i pcts-documents-mongodb sh -c 'mongorestore --archive -u {{usuario}} -p {{senha}}' < db_dump/{{arquivo_de_dump}}.gz
 ```
+
+__Exemplo de restauracao para uma base remota (Atlas MongoDB)__:
+
+```shell
+mongorestore --uri "mongodb://{{usuario}}:{{senha}}@{{cluster_host}}" --archive < db_dump/{{arquivo_de_dump}}.gz
+```
