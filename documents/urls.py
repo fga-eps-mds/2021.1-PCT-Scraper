@@ -10,5 +10,5 @@ router.register(r'glossary', views.GlossaryViewSet)
 
 urlpatterns = [
     path(r'', include(router.urls)),
-    path("api/search/", views.DocumentByKeyWordViewSet.as_view()),
+    path("api/documents/", views.DocumentByKeyWordViewSet.as_view()),
 ]
