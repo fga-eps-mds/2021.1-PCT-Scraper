@@ -10,4 +10,5 @@ router.register(r'glossary', views.GlossaryViewSet)
 
 urlpatterns = [
     path(r'', include(router.urls)),
+    path("api/search/", views.DocumentByKeyWordViewSet.as_view()),
 ]

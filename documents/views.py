@@ -1,4 +1,6 @@
 from rest_framework import viewsets
+from rest_framework import generics
+from django.db.models import Q
 from documents.serializers import DocumentSerializer
 from documents.serializers import GlossarySerializer
 
@@ -19,3 +21,20 @@ class GlossaryViewSet(viewsets.ModelViewSet):
     """
     queryset = Glossary.objects.all()
     serializer_class = GlossarySerializer
+
+class DocumentByKeyWordViewSet(generics.ListAPIView):
+        serializer_class = DocumentSerializer
+        http_method_names = ['get']
+
+        def get_queryset(self):
+            queryset = Document.objects.all()
+            keyword = self.request.GET.get('q', None)
+            if keyword is not None:
+                        queryset = queryset.filter(
+                                Q(url__contains=keyword) |
+                                Q(slug__contains=keyword) |
+                                Q(title__contains=keyword) |
+                                Q(content__contains=keyword)
+                            )
+            
+            return queryset

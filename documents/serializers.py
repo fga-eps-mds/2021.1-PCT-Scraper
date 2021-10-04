@@ -6,6 +6,7 @@ class DocumentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Document
         fields = '__all__'
+
 class GlossarySerializer(serializers.ModelSerializer):
     class Meta:
         model = Glossary
