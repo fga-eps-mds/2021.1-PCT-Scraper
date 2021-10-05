@@ -8,12 +8,12 @@ from documents.models import Document
 from documents.models import Glossary
 
 
-class DocumentViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows Documents to be viewed or edited.
-    """
-    queryset = Document.objects.all()
-    serializer_class = DocumentSerializer
+# class DocumentViewSet(viewsets.ModelViewSet):
+#     """
+#     API endpoint that allows Documents to be viewed or edited.
+#     """
+#     queryset = Document.objects.all()
+#     serializer_class = DocumentSerializer
 
 class GlossaryViewSet(viewsets.ModelViewSet):
     """
@@ -22,7 +22,7 @@ class GlossaryViewSet(viewsets.ModelViewSet):
     queryset = Glossary.objects.all()
     serializer_class = GlossarySerializer
 
-class DocumentByKeyWordViewSet(generics.ListAPIView):
+class DocumentViewSet(generics.ListAPIView):
         serializer_class = DocumentSerializer
         http_method_names = ['get']
 
