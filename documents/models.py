@@ -13,8 +13,3 @@ class Document(models.Model):
 
     def __str__(self):
         return self.name
-
-
-class Glossary(models.Model):
-    keyword = models.CharField(max_length=240)
-    created_at = models.DateTimeField(auto_now_add=True)
