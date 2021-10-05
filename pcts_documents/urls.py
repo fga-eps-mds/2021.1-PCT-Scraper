@@ -17,11 +17,7 @@ from django.contrib import admin
 from django.urls import path
 
 from django.urls import include, path
-# from rest_framework import routers
-# from documents import views
 
-# router = routers.DefaultRouter()
-# router.register(r'documents', views.DocumentViewSet)
 
 urls = [
     path('documents/', include('documents.urls'))
@@ -30,6 +26,6 @@ urls = [
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include(urls)),
+    path('api/', include(urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]
