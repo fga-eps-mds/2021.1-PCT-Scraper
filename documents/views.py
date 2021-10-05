@@ -5,9 +5,8 @@ from documents.serializers import DocumentSerializer
 
 from documents.models import Document
 
-class DocumentViewSet(generics.ListAPIView):
+class DocumentViewSet(viewsets.ModelViewSet):
         serializer_class = DocumentSerializer
-        http_method_names = ['get']
 
         def get_queryset(self):
             queryset = Document.objects.all()
