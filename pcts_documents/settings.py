@@ -32,6 +32,9 @@ ENVIRONMENT_TYPE = os.environ.get('ENVIRONMENT', default='development')
 
 # Application definition
 
+# Fix pagination next to https
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10
