@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -25,7 +26,8 @@ SECRET_KEY = 'django-insecure-csjnfz&f1o=0h%9)sb%4gxh!dx0hxb3eh*qjz&94@d@46423^l
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [os.environ.get('ALLOWED_HOSTS')]
+ENVIRONMENT_TYPE = os.environ.get('ENVIRONMENT', default='development')
 
 
 # Application definition
@@ -81,11 +83,34 @@ WSGI_APPLICATION = 'pcts_documents.wsgi.application'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': 'sqlite3.db',
+    # }
 }
+
+if ENVIRONMENT_TYPE == 'development':
+    DATABASES['default'] = {
+        'ENGINE': 'djongo',
+        'NAME': os.environ.get('PCTS_DOCUMENTS_DB_NAME'),
+        'ENFORCE_SCHEMA': False,
+        'CLIENT': {
+            'host': os.environ.get('PCTS_DOCUMENTS_DB_HOST'),
+            'port': int(os.environ.get('PCTS_DOCUMENTS_DB_PORT')),
+            'username': os.environ.get('PCTS_DOCUMENTS_DB_USER'),
+            'password': os.environ.get('PCTS_DOCUMENTS_DB_PASS'),
+            'authMechanism': 'SCRAM-SHA-1'
+        }
+    }
+elif ENVIRONMENT_TYPE == 'homologation' or ENVIRONMENT_TYPE == 'production':
+    DATABASES['default'] = {
+        'ENGINE': 'djongo',
+        'NAME': os.environ.get('PCTS_DOCUMENTS_DB_NAME'),
+        'ENFORCE_SCHEMA': False,
+        'CLIENT': {
+            'host': os.environ.get('PCTS_DOCUMENTS_MONGODB_URL')
+        }
+    }
 
 
 # Password validation
@@ -112,13 +137,15 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Sao_Paulo'
 
 USE_I18N = True
 
 USE_L10N = True
 
 USE_TZ = True
+
+DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 
 
 # Static files (CSS, JavaScript, Images)

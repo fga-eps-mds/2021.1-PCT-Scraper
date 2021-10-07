@@ -12,6 +12,17 @@ jobs:
     env:
       GIT_SHA: ${{ github.sha }}
 
+    services:
+      pcts-documents-mongodb:
+        image: mongo
+        env:
+          MONGO_INITDB_ROOT_USERNAME: root
+          MONGO_INITDB_ROOT_PASSWORD: pctsdocuments
+        options: >-
+          --name pcts-documents-mongodb
+        ports:
+          - 27017:27017
+
     steps:
       - uses: actions/checkout@v2
 
@@ -24,7 +35,14 @@ jobs:
       - name: Run tests
         run: |
           docker run --env ENVIRONMENT=development --env ALLOWED_HOSTS=*\
+            --env ALLOWED_HOSTS=*\
+            --env PCTS_DOCUMENTS_DB_HOST=pcts-documents-mongodb\
+            --env PCTS_DOCUMENTS_DB_PORT=27017\
+            --env PCTS_DOCUMENTS_DB_USER=root\
+            --env PCTS_DOCUMENTS_DB_PASS=pctsdocuments\
+            --env PCTS_DOCUMENTS_DB_NAME=pcts-documents-mongodb\
             --volume ${PWD}/:/app\
+            --network ${{ job.container.network }}\
             pcts-documents bash -c\
             "python manage.py makemigrations &&\
               python manage.py migrate && coverage run --source='.'\
@@ -39,15 +57,33 @@ jobs:
   deploy_dev:
     if: github.ref == 'refs/heads/dev'
     needs: integration
+    env:
+      HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+      HEROKU_APP_NAME_DEV: ${{ 'pcts-documents-api-dev' }}
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
+
+      - name: Deploy to Heroku
+        run: |
+          heroku container:login
+          heroku container:push web -a $HEROKU_APP_NAME_DEV
+          heroku container:release web -a $HEROKU_APP_NAME_DEV
 
   deploy_main:
     if: github.ref == 'refs/heads/main'
     needs: integration
+    env:
+      HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+      HEROKU_APP_NAME_PROD: ${{ 'pcts-documents-api-prod' }}
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
+
+      - name: Deploy to Heroku
+        run: |
+          heroku container:login
+          heroku container:push web -a $HEROKU_APP_NAME_PROD
+          heroku container:release web -a $HEROKU_APP_NAME_PROD
