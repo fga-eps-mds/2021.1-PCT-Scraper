@@ -29,39 +29,50 @@ class DocumentViewSet(viewsets.ModelViewSet):
         return queryset
 
     def create(self, request, *args, **kwargs):
-        logger = logging.getLogger('django')
-        document_url = request.data.get("url")
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(
+            data={
+                'message': 'Document created/updated successfully'
+            },
+            status=status.HTTP_201_CREATED
+        )
 
-        try:
-            document_queryset = Document.objects.filter(url=document_url)
-        except Document.DoesNotExist:
-            document_queryset = None
+    # def create(self, request, *args, **kwargs):
+    #     logger = logging.getLogger('django')
+    #     document_url = request.data.get("url")
 
-        document_attributes = {
-            "source": request.data.get("source"),
-            "url": request.data.get("url"),
-            "slug": request.data.get("slug"),
-            "title": request.data.get("title"),
-            "content": request.data.get("content"),
-            "checksum": request.data.get("checksum"),
-            "updated_at": request.data.get("updated_at"),
-        }
+    #     try:
+    #         document_queryset = Document.objects.filter(url=document_url)
+    #     except Document.DoesNotExist:
+    #         document_queryset = None
 
-        if document_queryset:
-            logger.info("Update document")
-            saved_document = document_queryset.first()
+    #     document_attributes = {
+    #         "source": request.data.get("source"),
+    #         "url": request.data.get("url"),
+    #         "slug": request.data.get("slug"),
+    #         "title": request.data.get("title"),
+    #         "content": request.data.get("content"),
+    #         "checksum": request.data.get("checksum"),
+    #         "updated_at": request.data.get("updated_at"),
+    #     }
 
-            # Only change updated_at, if checksum changed
-            if saved_document.checksum == document_attributes["checksum"]:
-                document_attributes["updated_at"] = saved_document.updated_at
+    #     if document_queryset:
+    #         logger.info("Update document")
+    #         saved_document = document_queryset.first()
 
-            document_queryset.update(
-                **document_attributes
-            )
-        else:
-            logger.info("Save document")
-            Document.objects.create(
-                **document_attributes
-            )
+    #         # Only change updated_at, if checksum changed
+    #         if saved_document.checksum == document_attributes["checksum"]:
+    #             document_attributes["updated_at"] = saved_document.updated_at
 
-        return Response(status=status.HTTP_201_CREATED)
+    #         document_queryset.update(
+    #             **document_attributes
+    #         )
+    #     else:
+    #         logger.info("Save document")
+    #         Document.objects.create(
+    #             **document_attributes
+    #         )
+
+    #     return Response(status=status.HTTP_201_CREATED)
