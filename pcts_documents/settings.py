@@ -100,13 +100,13 @@ DATABASES = {
 if ENVIRONMENT_TYPE == 'development':
     DATABASES['default'] = {
         'ENGINE': 'djongo',
-        'NAME': os.environ.get('PCTS_DOCUMENTS_DB_NAME'),
+        'NAME': os.environ.get('PCTS_DOCUMENTS_DB_NAME', default="pcts-documents-mongodb"),
         'ENFORCE_SCHEMA': False,
         'CLIENT': {
-            'host': os.environ.get('PCTS_DOCUMENTS_DB_HOST'),
-            'port': int(os.environ.get('PCTS_DOCUMENTS_DB_PORT')),
-            'username': os.environ.get('PCTS_DOCUMENTS_DB_USER'),
-            'password': os.environ.get('PCTS_DOCUMENTS_DB_PASS'),
+            'host': os.environ.get('PCTS_DOCUMENTS_DB_HOST', default="localhost"),
+            'port': int(os.environ.get('PCTS_DOCUMENTS_DB_PORT', default=27017)),
+            'username': os.environ.get('PCTS_DOCUMENTS_DB_USER', default="root"),
+            'password': os.environ.get('PCTS_DOCUMENTS_DB_PASS', default="pctsdocuments"),
             'authMechanism': 'SCRAM-SHA-1'
         }
     }
