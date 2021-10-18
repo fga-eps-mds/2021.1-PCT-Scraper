@@ -17,6 +17,7 @@ class DocumentSerializer(serializers.ModelSerializer):
             "content",
             "checksum",
             "updated_at",
+            "classification"
         )
 
         extra_kwargs = {
@@ -46,6 +47,7 @@ class DocumentSerializer(serializers.ModelSerializer):
             "content": validated_data.get("content"),
             "checksum": validated_data.get("checksum"),
             "updated_at": validated_data.get("updated_at"),
+            "classification": validated_data.get("classification"),
         }
 
         if document_queryset:
