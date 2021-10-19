@@ -9,4 +9,4 @@ djongo
 dnspython
 django-cors-headers
 scikit-learn
-xgboost
+xgboost==1.4.2
