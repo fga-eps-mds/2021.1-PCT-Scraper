@@ -16,6 +16,7 @@ class DocumentSerializer(serializers.ModelSerializer):
             "title",
             "content",
             "checksum",
+            "created_at",
             "updated_at",
             "classification"
         )
