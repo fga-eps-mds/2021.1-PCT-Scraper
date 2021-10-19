@@ -8,3 +8,5 @@ coverage
 djongo
 dnspython
 django-cors-headers
+scikit-learn
+xgboost==1.4.2

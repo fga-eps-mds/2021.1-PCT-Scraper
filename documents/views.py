@@ -5,11 +5,15 @@ from documents.serializers import DocumentSerializer
 from rest_framework.response import Response
 from django.http import JsonResponse
 from rest_framework import status
-
+import pickle
 from documents.models import Document
 from django.core import serializers
 
 import logging
+from rest_framework.decorators import action
+from documents.models import Document
+import sys
+import os
 
 
 class DocumentViewSet(viewsets.ModelViewSet):
@@ -38,6 +42,30 @@ class DocumentViewSet(viewsets.ModelViewSet):
             },
             status=status.HTTP_201_CREATED
         )
+
+    @action(
+        detail=False, methods=['get'],
+        url_path='predict_classification',
+        url_name='get_or_create_consumer_with_schedule')
+    def get_or_create_consumer_with_schedule(self, request):
+        model = pickle.load(open("./documents/model/model.p", "rb"))
+        vectorizer = pickle.load(open("./documents/model/vectorizer.p", "rb"))
+
+        documents = Document.objects.all()
+        try:
+            for document in documents:
+                classification_predict = model.predict(
+                    vectorizer.transform([document.content])
+                    )
+                document.classification = classification_predict[0]
+                document.save()
+            return Response("Ok", status=200)
+        except Exception as err:
+            return Response(
+                f"Failed to predict documents classifications {str(err)}",
+                status=400
+                )
+        
 
     # def create(self, request, *args, **kwargs):
     #     logger = logging.getLogger('django')

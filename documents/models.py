@@ -10,6 +10,7 @@ class Document(models.Model):
     checksum = models.CharField(max_length=240, unique=True)
     updated_at = models.DateTimeField()
     created_at = models.DateTimeField(auto_now_add=True)
+    classification = models.CharField(max_length=240, null=True, blank=True)
 
     def __str__(self):
         return self.slug
