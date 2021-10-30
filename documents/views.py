@@ -29,7 +29,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
         queryset = self._filter_by_category(queryset, category)
         queryset = self._filter_by_keyword(queryset, keyword)
 
-        return queryset
+        return queryset.order_by('-updated_at')
 
     def _filter_by_source(self, queryset, source):
         if source is not None:
