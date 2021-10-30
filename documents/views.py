@@ -22,6 +22,30 @@ class DocumentViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = Document.objects.all()
         keyword = self.request.GET.get('q', None)
+        source = self.request.GET.get('source', None)
+        category = self.request.GET.get('category', None)
+
+        queryset = self._filter_by_source(queryset, source)
+        queryset = self._filter_by_category(queryset, category)
+        queryset = self._filter_by_keyword(queryset, keyword)
+
+        return queryset
+
+    def _filter_by_source(self, queryset, source):
+        if source is not None:
+            queryset = queryset.filter(
+                Q(source=source)
+            )
+        return queryset
+
+    def _filter_by_category(self, queryset, category):
+        if category is not None:
+            queryset = queryset.filter(
+                Q(classification=category)
+            )
+        return queryset
+
+    def _filter_by_keyword(self, queryset, keyword):
         if keyword is not None:
             queryset = queryset.filter(
                 Q(url__contains=keyword) |
@@ -56,7 +80,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
             for document in documents:
                 classification_predict = model.predict(
                     vectorizer.transform([document.content])
-                    )
+                )
                 document.classification = classification_predict[0]
                 document.save()
             return Response("Ok", status=200)
@@ -64,43 +88,4 @@ class DocumentViewSet(viewsets.ModelViewSet):
             return Response(
                 f"Failed to predict documents classifications {str(err)}",
                 status=400
-                )
-        
-
-    # def create(self, request, *args, **kwargs):
-    #     logger = logging.getLogger('django')
-    #     document_url = request.data.get("url")
-
-    #     try:
-    #         document_queryset = Document.objects.filter(url=document_url)
-    #     except Document.DoesNotExist:
-    #         document_queryset = None
-
-    #     document_attributes = {
-    #         "source": request.data.get("source"),
-    #         "url": request.data.get("url"),
-    #         "slug": request.data.get("slug"),
-    #         "title": request.data.get("title"),
-    #         "content": request.data.get("content"),
-    #         "checksum": request.data.get("checksum"),
-    #         "updated_at": request.data.get("updated_at"),
-    #     }
-
-    #     if document_queryset:
-    #         logger.info("Update document")
-    #         saved_document = document_queryset.first()
-
-    #         # Only change updated_at, if checksum changed
-    #         if saved_document.checksum == document_attributes["checksum"]:
-    #             document_attributes["updated_at"] = saved_document.updated_at
-
-    #         document_queryset.update(
-    #             **document_attributes
-    #         )
-    #     else:
-    #         logger.info("Save document")
-    #         Document.objects.create(
-    #             **document_attributes
-    #         )
-
-    #     return Response(status=status.HTTP_201_CREATED)
+            )
