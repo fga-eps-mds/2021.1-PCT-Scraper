@@ -16,16 +16,22 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from rest_framework.routers import DefaultRouter
 from django.urls import include, path
 
+from documents.urls import router as documents_router
+
+
+router = DefaultRouter()
+router.registry.extend(documents_router.registry)
 
 urls = [
     path('documents/', include('documents.urls'))
 ]
 
-
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('api/', include(urls)),
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
+    path('api/', include(router.urls)),
 ]

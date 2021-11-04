@@ -1,20 +1,28 @@
+import pandas as pd
+import sys
+import os
+import logging
+
+from rest_framework import mixins
 from datetime import datetime
 from rest_framework import viewsets
 from rest_framework import generics
 from django.db.models import Q
-from documents.serializers import DocumentSerializer
 from rest_framework.response import Response
+from django.http import HttpResponse
+from rest_framework.request import Request
 from django.http import JsonResponse
 from rest_framework import status
 import pickle
 from documents.models import Document
+from documents.serializers import DocumentSerializer
 from django.core import serializers
+from rest_framework import pagination
 
-import logging
 from rest_framework.decorators import action
 from documents.models import Document
-import sys
-import os
+
+from documents.utils import apply_all_filters
 
 
 class DocumentViewSet(viewsets.ModelViewSet):
@@ -29,74 +37,16 @@ class DocumentViewSet(viewsets.ModelViewSet):
         category = self.request.GET.get('category', None)
         order_by = self.request.GET.get('order-by', '-updated_at')
 
-        queryset = self._filter_by_date(queryset, date_lte, date_gte)
-        queryset = self._filter_by_source(queryset, source)
-        queryset = self._filter_by_category(queryset, category)
-        queryset = self._filter_by_keyword(queryset, keyword)
+        queryset = apply_all_filters(
+            queryset,
+            date_lte,
+            date_gte,
+            source,
+            category,
+            keyword
+        )
 
         return queryset.order_by(order_by)
-
-    def _filter_by_date(self, queryset, date_lte, date_gte):
-        if date_lte is not None:
-            queryset = queryset.filter(
-                Q(updated_at__lte=self._convert_to_max_datetime(date_lte))
-            )
-
-        if date_gte is not None:
-            queryset = queryset.filter(
-                Q(updated_at__gte=self._convert_to_min_datetime(date_gte))
-            )
-
-        return queryset
-
-    def _filter_by_source(self, queryset, source):
-        if source is not None:
-            queryset = queryset.filter(
-                Q(source=source)
-            )
-        return queryset
-
-    def _filter_by_category(self, queryset, category):
-        if category is not None:
-            queryset = queryset.filter(
-                Q(classification=category)
-            )
-        return queryset
-
-    def _filter_by_keyword(self, queryset, keyword):
-        if keyword is not None:
-            queryset = queryset.filter(
-                Q(url__contains=keyword) |
-                Q(slug__contains=keyword) |
-                Q(title__contains=keyword) |
-                Q(content__contains=keyword)
-            )
-
-        return queryset
-
-    def _convert_to_max_datetime(self, date):
-        # Converte um datetime para o maior
-        # horario possivel do dia
-        return datetime\
-            .fromisoformat(date)\
-            .replace(
-                minute=59,
-                hour=23,
-                second=59,
-                microsecond=999999
-            )
-
-    def _convert_to_min_datetime(self, date):
-        # Converte um datetime para o menor
-        # horario possivel do dia
-        return datetime\
-            .fromisoformat(date)\
-            .replace(
-                minute=0,
-                hour=0,
-                second=0,
-                microsecond=0
-            )
 
     def create(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
@@ -131,3 +81,74 @@ class DocumentViewSet(viewsets.ModelViewSet):
                 f"Failed to predict documents classifications {str(err)}",
                 status=400
             )
+
+
+class DocumentExportCSVViewSet(generics.GenericAPIView):
+
+    def get(self, request: Request, *args, **kwargs):
+        date_lte = request.query_params.get('date-lte', None)
+        date_gte = request.query_params.get('date-gte', None)
+        keyword = request.query_params.get('q', None)
+        source = request.query_params.get('source', None)
+        category = request.query_params.get('category', None)
+
+        queryset = Document.objects.all()
+
+        # Filtros
+        queryset = apply_all_filters(
+            queryset,
+            date_lte,
+            date_gte,
+            source,
+            category,
+            keyword
+        )
+
+        # Preparacao de exportacao
+        df = self._prepare_dataframe(queryset)
+
+
+        # Exportacao
+        response = HttpResponse(
+            content_type='text/csv',
+            headers={
+                'Content-Disposition':
+                ('attachment; '
+                 'filename="pcts_busca_export_'
+                 f'{self._get_current_datetime()}.csv"'
+                 )
+            },
+        )
+
+        df.to_csv(path_or_buf=response, index=False)
+
+        return response
+
+    def _prepare_dataframe(self, queryset):
+        # Preparar exportacao
+        df = pd.DataFrame(list(queryset.values()))
+
+        df = df[["title", "source", "url",
+                 "classification", "created_at", "updated_at"]]
+
+        # Format Dtaae
+        df['created_at'] = pd.to_datetime(df["created_at"].dt.strftime('%d/%m/%Y %H:%M'))
+        df['updated_at'] = pd.to_datetime(df["updated_at"].dt.strftime('%d/%m/%Y %H:%M'))
+
+        df = df.rename(columns={
+            'title': 'Título',
+            'source': 'Fonte',
+            'url': 'URL',
+            'classification': 'Classificação',
+            'created_at': 'Primeira Extração',
+            'updated_at': 'Última Atualização'
+        })
+
+        return df
+
+    def _get_current_datetime(self):
+        return datetime.now().\
+            replace(second=0, microsecond=0)
+
+    def _get_formatted_date(self, document_datetime: datetime):
+        return document_datetime.strftime("%d/%m/%Y %H:%M")
