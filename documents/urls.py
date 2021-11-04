@@ -10,5 +10,5 @@ router.register(r'documents', views.DocumentViewSet, basename="Documents")
 
 
 urlpatterns = [
-    path(r'export/', views.DocumentExportViewSet.as_view(), name='documents-export'),
+    path(r'export-csv/', views.DocumentExportCSVViewSet.as_view(), name='documents-export'),
 ]

@@ -1,15 +1,18 @@
+import csv
+
 from rest_framework import mixins
 from datetime import datetime
 from rest_framework import viewsets
 from rest_framework import generics
 from django.db.models import Q
-from documents.serializers import DocumentSerializer
 from rest_framework.response import Response
+from django.http import HttpResponse
 from rest_framework.request import Request
 from django.http import JsonResponse
 from rest_framework import status
 import pickle
 from documents.models import Document
+from documents.serializers import DocumentSerializer
 from django.core import serializers
 from rest_framework import pagination
 
@@ -52,7 +55,6 @@ class DocumentViewSet(viewsets.ModelViewSet):
 
         return queryset
 
-
     def _filter_by_source(self, queryset, source):
         if source is not None:
             queryset = queryset.filter(
@@ -60,14 +62,12 @@ class DocumentViewSet(viewsets.ModelViewSet):
             )
         return queryset
 
-
     def _filter_by_category(self, queryset, category):
         if category is not None:
             queryset = queryset.filter(
                 Q(classification=category)
             )
         return queryset
-
 
     def _filter_by_keyword(self, queryset, keyword):
         if keyword is not None:
@@ -139,38 +139,46 @@ class DocumentViewSet(viewsets.ModelViewSet):
             )
 
 
-class ExportPagination(pagination.PageNumberPagination):
-    page_size = None
-
-
-# class DocumentExportViewSet(mixins.RetrieveModelMixin,
-#                             mixins.DestroyModelMixin,
-#                             mixins.ListModelMixin,
-#                             viewsets.GenericViewSet):
-#     serializer_class = DocumentSerializer
-
-#     pagination_class = ExportPagination
-#     queryset = None
-#     model = None
-#     fields = []
-
-#     def get_queryset(self):
-#         queryset = Document.objects.all()
-#         return queryset
-
-import csv
-from django.http import HttpResponse
-
-class DocumentExportViewSet(generics.GenericAPIView):
+class DocumentExportCSVViewSet(generics.GenericAPIView):
 
     def get(self, request, *args, **kwargs):
         response = HttpResponse(
             content_type='text/csv',
-            headers={'Content-Disposition': 'attachment; filename="somefilename.csv"'},
+            headers={
+                'Content-Disposition':
+                f'attachment; filename="busca_{self._get_current_datetime()}.csv"'
+            },
         )
-
         writer = csv.writer(response)
-        writer.writerow(['First row', 'Foo', 'Bar', 'Baz'])
-        writer.writerow(['Second row', 'A', 'B', 'C', '"Testing"', "Here's a quote"])
+        self._make_header(writer)
+        self._make_body(writer)
 
         return response
+
+    def _get_current_datetime(self):
+        return datetime.now().\
+            replace(second=0, microsecond=0)
+
+    def _make_header(self, writer):
+        writer.writerow([
+            'Título',
+            'Fonte',
+            'URL',
+            'Primeira Coleta',
+            'Última Atualização'
+        ])
+
+    def _make_body(self, writer):
+        documents = Document.objects.all()
+
+        for document in documents:
+            writer.writerow([
+                document.title,
+                document.source,
+                document.url,
+                self._get_formatted_date(document.created_at),
+                self._get_formatted_date(document.updated_at),
+            ])
+
+    def _get_formatted_date(self, document_datetime: datetime):
+        return document_datetime.strftime("%d/%m/%Y %H:%M")
