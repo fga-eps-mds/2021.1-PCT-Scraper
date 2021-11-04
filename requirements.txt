@@ -10,3 +10,4 @@ dnspython
 django-cors-headers
 scikit-learn
 xgboost==1.4.2
+pandas==1.3.4

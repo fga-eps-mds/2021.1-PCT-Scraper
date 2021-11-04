@@ -1,7 +1,7 @@
+import pandas as pd
 import sys
 import os
 import logging
-import csv
 
 from rest_framework import mixins
 from datetime import datetime
@@ -92,6 +92,23 @@ class DocumentExportCSVViewSet(generics.GenericAPIView):
         source = request.query_params.get('source', None)
         category = request.query_params.get('category', None)
 
+        queryset = Document.objects.all()
+
+        # Filtros
+        queryset = apply_all_filters(
+            queryset,
+            date_lte,
+            date_gte,
+            source,
+            category,
+            keyword
+        )
+
+        # Preparacao de exportacao
+        df = self._prepare_dataframe(queryset)
+
+
+        # Exportacao
         response = HttpResponse(
             content_type='text/csv',
             headers={
@@ -102,55 +119,36 @@ class DocumentExportCSVViewSet(generics.GenericAPIView):
                  )
             },
         )
-        writer = csv.writer(response)
-        self._make_header(writer)
-        self._make_body(
-            writer,
-            date_lte,
-            date_gte,
-            keyword,
-            source,
-            category
-        )
+
+        df.to_csv(path_or_buf=response, index=False)
 
         return response
+
+    def _prepare_dataframe(self, queryset):
+        # Preparar exportacao
+        df = pd.DataFrame(list(queryset.values()))
+
+        df = df[["title", "source", "url",
+                 "classification", "created_at", "updated_at"]]
+
+        # Format Dtaae
+        df['created_at'] = pd.to_datetime(df["created_at"].dt.strftime('%d/%m/%Y %H:%M'))
+        df['updated_at'] = pd.to_datetime(df["updated_at"].dt.strftime('%d/%m/%Y %H:%M'))
+
+        df = df.rename(columns={
+            'title': 'Título',
+            'source': 'Fonte',
+            'url': 'URL',
+            'classification': 'Classificação',
+            'created_at': 'Primeira Extração',
+            'updated_at': 'Última Atualização'
+        })
+
+        return df
 
     def _get_current_datetime(self):
         return datetime.now().\
             replace(second=0, microsecond=0)
-
-    def _make_header(self, writer):
-        writer.writerow([
-            'Título',
-            'Fonte',
-            'URL',
-            'Classificação',
-            'Primeira Coleta',
-            'Última Atualização'
-        ])
-
-    def _make_body(self, writer, date_lte, date_gte, keyword,
-                   source, category):
-        documents = Document.objects.all()
-
-        documents = apply_all_filters(
-            documents,
-            date_lte,
-            date_gte,
-            source,
-            category,
-            keyword
-        )
-
-        for document in documents:
-            writer.writerow([
-                document.title,
-                document.source,
-                document.url,
-                document.classification,
-                self._get_formatted_date(document.created_at),
-                self._get_formatted_date(document.updated_at),
-            ])
 
     def _get_formatted_date(self, document_datetime: datetime):
         return document_datetime.strftime("%d/%m/%Y %H:%M")
