@@ -3,10 +3,8 @@ from rest_framework import routers
 
 from documents import views
 
-
+app_name = 'documents'
 router = routers.DefaultRouter()
-router.register(r'', views.DocumentViewSet, basename='DocumentViewSet')
+router.register(r'documents', views.DocumentViewSet, basename="Documents")
 
-urlpatterns = [
-    path(r'', include(router.urls)),
-]
+router.register(r'documents-export', views.DocumentExportViewSet, basename='Documents')

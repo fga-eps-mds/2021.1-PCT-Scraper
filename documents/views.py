@@ -1,14 +1,17 @@
+from rest_framework import mixins
 from datetime import datetime
 from rest_framework import viewsets
 from rest_framework import generics
 from django.db.models import Q
 from documents.serializers import DocumentSerializer
 from rest_framework.response import Response
+from rest_framework.request import Request
 from django.http import JsonResponse
 from rest_framework import status
 import pickle
 from documents.models import Document
 from django.core import serializers
+from rest_framework import pagination
 
 import logging
 from rest_framework.decorators import action
@@ -49,6 +52,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
 
         return queryset
 
+
     def _filter_by_source(self, queryset, source):
         if source is not None:
             queryset = queryset.filter(
@@ -56,12 +60,14 @@ class DocumentViewSet(viewsets.ModelViewSet):
             )
         return queryset
 
+
     def _filter_by_category(self, queryset, category):
         if category is not None:
             queryset = queryset.filter(
                 Q(classification=category)
             )
         return queryset
+
 
     def _filter_by_keyword(self, queryset, keyword):
         if keyword is not None:
@@ -131,3 +137,23 @@ class DocumentViewSet(viewsets.ModelViewSet):
                 f"Failed to predict documents classifications {str(err)}",
                 status=400
             )
+
+
+class ExportPagination(pagination.PageNumberPagination):
+    page_size = None
+
+
+class DocumentExportViewSet(mixins.RetrieveModelMixin,
+                            mixins.DestroyModelMixin,
+                            mixins.ListModelMixin,
+                            viewsets.GenericViewSet):
+    serializer_class = DocumentSerializer
+
+    pagination_class = ExportPagination
+    queryset = None
+    model = None
+    fields = []
+
+    def get_queryset(self):
+        queryset = Document.objects.all()
+        return queryset
