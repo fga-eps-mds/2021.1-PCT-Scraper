@@ -27,15 +27,14 @@ class DocumentViewSet(viewsets.ModelViewSet):
         keyword = self.request.GET.get('q', None)
         source = self.request.GET.get('source', None)
         category = self.request.GET.get('category', None)
-
-        print("TIPO DE DATA")
+        order_by = self.request.GET.get('order-by', '-updated_at')
 
         queryset = self._filter_by_date(queryset, date_lte, date_gte)
         queryset = self._filter_by_source(queryset, source)
         queryset = self._filter_by_category(queryset, category)
         queryset = self._filter_by_keyword(queryset, keyword)
 
-        return queryset.order_by('-updated_at')
+        return queryset.order_by(order_by)
 
     def _filter_by_date(self, queryset, date_lte, date_gte):
         if date_lte is not None:
