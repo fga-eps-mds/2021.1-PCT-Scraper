@@ -22,8 +22,8 @@ class DocumentViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = Document.objects.all()
-        date_lte = self.request.GET.get('date_lte', None)
-        date_gte = self.request.GET.get('date_gte', None)
+        date_lte = self.request.GET.get('date-lte', None)
+        date_gte = self.request.GET.get('date-gte', None)
         keyword = self.request.GET.get('q', None)
         source = self.request.GET.get('source', None)
         category = self.request.GET.get('category', None)
