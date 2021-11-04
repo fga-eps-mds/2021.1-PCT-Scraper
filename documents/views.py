@@ -85,17 +85,33 @@ class DocumentViewSet(viewsets.ModelViewSet):
 
 class DocumentExportCSVViewSet(generics.GenericAPIView):
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request: Request, *args, **kwargs):
+        date_lte = request.query_params.get('date-lte', None)
+        date_gte = request.query_params.get('date-gte', None)
+        keyword = request.query_params.get('q', None)
+        source = request.query_params.get('source', None)
+        category = request.query_params.get('category', None)
+
         response = HttpResponse(
             content_type='text/csv',
             headers={
                 'Content-Disposition':
-                f'attachment; filename="busca_{self._get_current_datetime()}.csv"'
+                ('attachment; '
+                 'filename="pcts_busca_export_'
+                 f'{self._get_current_datetime()}.csv"'
+                 )
             },
         )
         writer = csv.writer(response)
         self._make_header(writer)
-        self._make_body(writer)
+        self._make_body(
+            writer,
+            date_lte,
+            date_gte,
+            keyword,
+            source,
+            category
+        )
 
         return response
 
@@ -108,18 +124,30 @@ class DocumentExportCSVViewSet(generics.GenericAPIView):
             'Título',
             'Fonte',
             'URL',
+            'Classificação',
             'Primeira Coleta',
             'Última Atualização'
         ])
 
-    def _make_body(self, writer):
+    def _make_body(self, writer, date_lte, date_gte, keyword,
+                   source, category):
         documents = Document.objects.all()
+
+        documents = apply_all_filters(
+            documents,
+            date_lte,
+            date_gte,
+            source,
+            category,
+            keyword
+        )
 
         for document in documents:
             writer.writerow([
                 document.title,
                 document.source,
                 document.url,
+                document.classification,
                 self._get_formatted_date(document.created_at),
                 self._get_formatted_date(document.updated_at),
             ])
