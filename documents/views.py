@@ -1,3 +1,4 @@
+from datetime import datetime
 from rest_framework import viewsets
 from rest_framework import generics
 from django.db.models import Q
@@ -21,15 +22,32 @@ class DocumentViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = Document.objects.all()
+        date_lte = self.request.GET.get('date-lte', None)
+        date_gte = self.request.GET.get('date-gte', None)
         keyword = self.request.GET.get('q', None)
         source = self.request.GET.get('source', None)
         category = self.request.GET.get('category', None)
+        order_by = self.request.GET.get('order-by', '-updated_at')
 
+        queryset = self._filter_by_date(queryset, date_lte, date_gte)
         queryset = self._filter_by_source(queryset, source)
         queryset = self._filter_by_category(queryset, category)
         queryset = self._filter_by_keyword(queryset, keyword)
 
-        return queryset.order_by('-updated_at')
+        return queryset.order_by(order_by)
+
+    def _filter_by_date(self, queryset, date_lte, date_gte):
+        if date_lte is not None:
+            queryset = queryset.filter(
+                Q(updated_at__lte=self._convert_to_max_datetime(date_lte))
+            )
+
+        if date_gte is not None:
+            queryset = queryset.filter(
+                Q(updated_at__gte=self._convert_to_min_datetime(date_gte))
+            )
+
+        return queryset
 
     def _filter_by_source(self, queryset, source):
         if source is not None:
@@ -55,6 +73,30 @@ class DocumentViewSet(viewsets.ModelViewSet):
             )
 
         return queryset
+
+    def _convert_to_max_datetime(self, date):
+        # Converte um datetime para o maior
+        # horario possivel do dia
+        return datetime\
+            .fromisoformat(date)\
+            .replace(
+                minute=59,
+                hour=23,
+                second=59,
+                microsecond=999999
+            )
+
+    def _convert_to_min_datetime(self, date):
+        # Converte um datetime para o menor
+        # horario possivel do dia
+        return datetime\
+            .fromisoformat(date)\
+            .replace(
+                minute=0,
+                hour=0,
+                second=0,
+                microsecond=0
+            )
 
     def create(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
