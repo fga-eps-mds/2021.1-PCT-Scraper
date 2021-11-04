@@ -143,17 +143,34 @@ class ExportPagination(pagination.PageNumberPagination):
     page_size = None
 
 
-class DocumentExportViewSet(mixins.RetrieveModelMixin,
-                            mixins.DestroyModelMixin,
-                            mixins.ListModelMixin,
-                            viewsets.GenericViewSet):
-    serializer_class = DocumentSerializer
+# class DocumentExportViewSet(mixins.RetrieveModelMixin,
+#                             mixins.DestroyModelMixin,
+#                             mixins.ListModelMixin,
+#                             viewsets.GenericViewSet):
+#     serializer_class = DocumentSerializer
 
-    pagination_class = ExportPagination
-    queryset = None
-    model = None
-    fields = []
+#     pagination_class = ExportPagination
+#     queryset = None
+#     model = None
+#     fields = []
 
-    def get_queryset(self):
-        queryset = Document.objects.all()
-        return queryset
+#     def get_queryset(self):
+#         queryset = Document.objects.all()
+#         return queryset
+
+import csv
+from django.http import HttpResponse
+
+class DocumentExportViewSet(generics.GenericAPIView):
+
+    def get(self, request, *args, **kwargs):
+        response = HttpResponse(
+            content_type='text/csv',
+            headers={'Content-Disposition': 'attachment; filename="somefilename.csv"'},
+        )
+
+        writer = csv.writer(response)
+        writer.writerow(['First row', 'Foo', 'Bar', 'Baz'])
+        writer.writerow(['Second row', 'A', 'B', 'C', '"Testing"', "Here's a quote"])
+
+        return response
