@@ -1,4 +1,5 @@
 import logging
+import pickle
 
 from rest_framework import serializers
 from documents.models import Document
@@ -7,9 +8,13 @@ from rest_framework.validators import UniqueTogetherValidator
 
 
 class DocumentSerializer(serializers.ModelSerializer):
+    model = pickle.load(open("./documents/model/model.p", "rb"))
+    vectorizer = pickle.load(open("./documents/model/vectorizer.p", "rb"))
+
     class Meta:
         model = Document
         fields = (
+            "id",
             "source",
             "url",
             "slug",
@@ -48,7 +53,9 @@ class DocumentSerializer(serializers.ModelSerializer):
             "content": validated_data.get("content"),
             "checksum": validated_data.get("checksum"),
             "updated_at": validated_data.get("updated_at"),
-            "classification": validated_data.get("classification"),
+            "classification": self.get_classification(
+                validated_data.get("content")
+            ),
         }
 
         if document_queryset:
@@ -69,3 +76,10 @@ class DocumentSerializer(serializers.ModelSerializer):
             )
 
         return document
+
+    def get_classification(self, content: str):
+        classification_predict = self.model.predict(
+            self.vectorizer.transform([content])
+        )
+
+        return classification_predict[0] if classification_predict else None
