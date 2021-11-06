@@ -52,10 +52,6 @@ class DocumentSerializer(serializers.ModelSerializer):
             "title": validated_data.get("title"),
             "content": validated_data.get("content"),
             "checksum": validated_data.get("checksum"),
-            "updated_at": validated_data.get("updated_at"),
-            "classification": self.get_classification(
-                validated_data.get("content")
-            ),
         }
 
         if document_queryset:
@@ -63,14 +59,26 @@ class DocumentSerializer(serializers.ModelSerializer):
             saved_document = document_queryset.first()
 
             # Only change updated_at, if checksum changed
-            if saved_document.checksum == document_attributes["checksum"]:
-                document_attributes["updated_at"] = saved_document.updated_at
+            if saved_document.checksum != validated_data.get("checksum"):
+                document_attributes["updated_at"] = validated_data.get(
+                    "updated_at")
+
+            if (saved_document.checksum != validated_data.get("checksum") or
+                    not saved_document.classification):
+                document_attributes["classification"] = self.get_classification(
+                    validated_data.get("content")
+                )
 
             document = document_queryset.update(
                 **document_attributes
             )
         else:
             logger.info(f"Saving document {validated_data.get('slug')} ...")
+
+            document_attributes["classification"] = self.get_classification(
+                validated_data.get("content")
+            )
+
             document = Document.objects.create(
                 **document_attributes
             )
