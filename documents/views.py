@@ -35,7 +35,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
         keyword = self.request.GET.get('q', None)
         source = self.request.GET.get('source', None)
         category = self.request.GET.get('category', None)
-        order_by = self.request.GET.get('order-by', '-updated_at')
+        order_by = self.request.GET.get('order-by', '-created_at')
 
         queryset = apply_all_filters(
             queryset,
