@@ -15,12 +15,12 @@ def apply_all_filters(queryset, date_lte, date_gte,
 def filter_by_date(queryset, date_lte, date_gte):
     if date_lte is not None:
         queryset = queryset.filter(
-            Q(updated_at__lte=convert_to_max_datetime(date_lte))
+            Q(created_at__lte=convert_to_max_datetime(date_lte))
         )
 
     if date_gte is not None:
         queryset = queryset.filter(
-            Q(updated_at__gte=convert_to_min_datetime(date_gte))
+            Q(created_at__gte=convert_to_min_datetime(date_gte))
         )
 
     return queryset
