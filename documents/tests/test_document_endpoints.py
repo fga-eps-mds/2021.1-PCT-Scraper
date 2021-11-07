@@ -93,3 +93,20 @@ class TestDocumentEndpoint(APITestCase):
             1,
             len(response['results']),
         )
+
+    def test_export_search(self):
+        Document.objects.create(
+            source='fonte1',
+            url='fonte1.com/doc1',
+            slug='doc1',
+            title='Doc 1',
+            content='Content',
+            checksum='123456789',
+            updated_at=datetime.now()
+        )
+
+        response = self.client.get(
+            '/api/documents/export/'
+        )
+
+        self.assertEqual(response.status_code, 200)
