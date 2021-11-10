@@ -107,7 +107,6 @@ class DocumentExportCSVViewSet(generics.GenericAPIView):
         # Preparacao de exportacao
         df = self._prepare_dataframe(queryset)
 
-
         # Exportacao
         response = HttpResponse(
             content_type='text/csv',
@@ -131,9 +130,11 @@ class DocumentExportCSVViewSet(generics.GenericAPIView):
         df = df[["title", "source", "url",
                  "classification", "created_at", "updated_at"]]
 
-        # Format Dtaae
-        df['created_at'] = pd.to_datetime(df["created_at"].dt.strftime('%d/%m/%Y %H:%M'))
-        df['updated_at'] = pd.to_datetime(df["updated_at"].dt.strftime('%d/%m/%Y %H:%M'))
+        # Format Date
+        df['created_at'] = pd.to_datetime(df['created_at'], errors='coerce')\
+            .dt.strftime('%d/%m/%Y %H:%M')
+        df['updated_at'] = pd.to_datetime(df['updated_at'], errors='coerce')\
+            .dt.strftime('%d/%m/%Y %H:%M')
 
         df = df.rename(columns={
             'title': 'Título',
