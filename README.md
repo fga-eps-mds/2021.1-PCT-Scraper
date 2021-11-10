@@ -22,6 +22,31 @@
 - [Docker](https://docs.docker.com/engine/install/ubuntu/)
 - [Docker Compose](https://docs.docker.com/compose/install/)
 
+### Implatação manual (localmente)
+
+1. Configurar variáveis de ambiente (containers):
+  * Atualizar arquivo "env" na raiz do repositório
+  * Adicionar os hosts (ips) das apis de documentos e crawlers
+  * Variáveis necessárias:
+  ```shell
+    PCTS_DOCUMENTS_DB_HOST # Host do banco de documentos
+    PCTS_DOCUMENTS_DB_PORT # Porta do banco de documentos
+    PCTS_DOCUMENTS_DB_USER # Usuario do banco de documentos
+    MONGO_INITDB_ROOT_USERNAME # Usuario do banco de documentos (container do db)
+    PCTS_DOCUMENTS_DB_PASS # Senha do banco 
+    MONGO_INITDB_ROOT_PASSWORD # Senha do banco (Container do db)
+    PCTS_DOCUMENTS_DB_NAME # Nome do banco de documentos
+    ALLOWED_HOSTS=* # Hosts permitidos a conectar com a api
+    ENVIRONMENT=development # Não precisa altera
+
+    ME_CONFIG_MONGODB_SERVER # (Mongo express)
+    ME_CONFIG_MONGODB_ADMINUSERNAME # (Mongo express)
+    ME_CONFIG_MONGODB_ADMINPASSWORD # (Mongo express)
+    ME_CONFIG_MONGODB_ENABLE_ADMIN=true # Não precisa alterar (Mongo express)
+    ME_CONFIG_BASICAUTH_USERNAME=admin # Usuario (Mongo express)
+    ME_CONFIG_BASICAUTH_PASSWORD=admin # Senha (Mongo express)
+  ```
+
 ### Iniciar a API
 
 ```shell

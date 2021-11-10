@@ -4,9 +4,10 @@ services:
     image: mongo
     container_name: pcts-documents-mongodb
     hostname: pcts-documents-mongodb
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=pctsdocuments
+    # environment:
+    #   - MONGO_INITDB_ROOT_USERNAME=root
+    #   - MONGO_INITDB_ROOT_PASSWORD=pctsdocuments
+    env_file: env
     volumes:
       - pcts-documents-mongodb-data:/data/db
     networks:
@@ -23,13 +24,14 @@ services:
   pcts-documents-mongo-express:
     image: mongo-express
     container_name: pcts-documents-mongo-express
-    environment:
-      - ME_CONFIG_MONGODB_SERVER=pcts-documents-mongodb
-      - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
-      - ME_CONFIG_MONGODB_ADMINUSERNAME=root
-      - ME_CONFIG_MONGODB_ADMINPASSWORD=pctsdocuments
-      - ME_CONFIG_BASICAUTH_USERNAME=admin
-      - ME_CONFIG_BASICAUTH_PASSWORD=admin
+    # environment:
+    #   - ME_CONFIG_MONGODB_SERVER=pcts-documents-mongodb
+    #   - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
+    #   - ME_CONFIG_MONGODB_ADMINUSERNAME=root
+    #   - ME_CONFIG_MONGODB_ADMINPASSWORD=pctsdocuments
+    #   - ME_CONFIG_BASICAUTH_USERNAME=admin
+    #   - ME_CONFIG_BASICAUTH_PASSWORD=admin
+    env_file: env
     volumes:
       - pcts-documents-mongodb-data
     depends_on:
@@ -51,14 +53,14 @@ services:
     hostname: pcts-documents
     build: .
     image: pcts-documents
-    environment:
-      ALLOWED_HOSTS: '*'
-      PCTS_DOCUMENTS_DB_HOST: pcts-documents-mongodb
-      PCTS_DOCUMENTS_DB_PORT: 27017
-      PCTS_DOCUMENTS_DB_USER: root
-      PCTS_DOCUMENTS_DB_PASS: pctsdocuments
-      PCTS_DOCUMENTS_DB_NAME: pcts-documents-mongodb
-    # env_file: dev-env
+    # environment:
+    #   ALLOWED_HOSTS: '*'
+    #   PCTS_DOCUMENTS_DB_HOST: pcts-documents-mongodb
+    #   PCTS_DOCUMENTS_DB_PORT: 27017
+    #   PCTS_DOCUMENTS_DB_USER: root
+    #   PCTS_DOCUMENTS_DB_PASS: pctsdocuments
+    #   PCTS_DOCUMENTS_DB_NAME: pcts-documents-mongodb
+    env_file: env
     command: ["sh", "scripts/start_dev.sh"]
     ports:
       - 8000:8000
